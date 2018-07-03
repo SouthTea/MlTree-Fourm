@@ -12,6 +12,7 @@
 // 应用公共文件
 use think\Db;
 use Auth\Auth;
+use Markdown\Parser;
 
 function createStr($length)
 {
@@ -116,4 +117,10 @@ function outResult($code=0, $msg, $url='')
     } else {
         return ['code'=>$code,'message'=>$msg,'url'=>$url,'time'=>time()];
     }
+}
+
+function markdownEncode($text){
+    $parser = new Parser;
+    $html = $parser->makeHtml($text);
+    return $html;
 }

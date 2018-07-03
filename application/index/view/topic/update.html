@@ -23,11 +23,8 @@
                 required/>
         </div>
 
-        <div id="editor">
-            {$topicData.content|raw}
-        </div>
-        <div class="mdui-m-y-1"></div>
-        <input id="content" type="hidden" name="content" value="{$topicData.content}" required>
+        <textarea id="editor" name="content" required></textarea>
+
         <input id="files" type="hidden" name="files" value=""> {:token()}
         <input type="hidden" name="sign" value="{$topicData.sign}">
     </form>
@@ -43,14 +40,52 @@
 </div>
 
 {/block} {block name="js"}
-<script src="__JS__/wangEditor.js"></script>
+<script src="__JS__/simplemde.min.js"></script>
 <script src="__JS__/mltree-editor.js"></script>
 <script>
-    var option = {
-        uploadImg: "{:url('index/expand/picUpload')}",
-        uploadFile: '{:url("index/expand/upload")}',
+    let option = {
         uid: "{:session('uid')}",
-        createUrl: '{:url("index/topic/update",["tid"=>$topicData.tid])}',
+        url: '{:url("index/topic/update")}',
     }
-    regEditor('def', option)
+    var editor = new MLTeditor(option)
+
+    layui.use('layer', function () {
+        let layer = layui.layer;
+
+        //绑定发帖事件
+        $$('#create').on('click', function () {
+            //设定textarea的内容
+            $$('#editor').text(editor.value());
+
+            //获取表单内容
+            let submitData = $$('form').serialize();
+
+            getAjax(option.url, submitData, function (res) {
+                if (res.code == 1) {
+                    mdui.snackbar({
+                        message: res.message,
+                        position: 'top',
+                        onClosed: function () {
+                            window.location.href = res.url;
+                        }
+                    })
+                } else {
+                    mdui.snackbar({
+                        message: res.message,
+                        position: 'top',
+                        onClosed: function () {
+                            location.reload();
+                        }
+                    })
+                }
+            })
+
+            return false;
+        });
+
+        layer.photos({
+            photos: '#mf-content,#mf-comments',
+            anim: 5
+        });
+    });
 </script> {/block}

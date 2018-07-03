@@ -164,3 +164,15 @@ function recomment(_id) {
         editor.txt.append(html);
     }
 }
+
+function getAjax(url, data, callback) {
+    $$.ajax({
+        method: 'POST',
+        url: url,
+        data: data,
+        dataType: 'json',
+        success: function (res) {
+            callback(res);
+        }
+    });
+}

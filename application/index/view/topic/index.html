@@ -13,9 +13,8 @@
                 <i class="mdui-icon material-icons">looks</i>{$topicData.views}</span>
         </header>
         <div class="mf-panel-bd">
-            <div class="content" id="mf-content">
-                {$topicData.content|raw}
-            </div>
+            <div class="content" id="mf-content">{$topicData.content|raw}</div>
+            
             {if !empty($attaList)}
             <div class="attaList">
                 <header>
@@ -97,12 +96,11 @@
 </form>
 
 {/block} {block name="js"}
-<script src="__JS__/wangEditor.js"></script>
+<script src="__JS__/simplemde.js"></script>
 <script src="__JS__/mltree-flow.js"></script>
 <script src="__JS__/mltree-editor.js"></script>
 <script>
     var option = {
-        uploadImg: "{:url('index/expand/picUpload')}",
         commentUrl: "{:url('index/topic/comment',['tid'=>$topicData.tid])}",
         uid: "{:session('uid')}",
         subject: "{$topicData.subject}",
@@ -110,6 +108,5 @@
     //调用flow加载
     var flow = new mfFlow('comment');
     flow.flow('{$topicData.tid}');
-
-    regEditor(type = 'comment', option);
+    // regEditor(type = 'comment', option);
 </script>{/block}
