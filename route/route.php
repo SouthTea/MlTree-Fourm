@@ -16,6 +16,8 @@ Route::any('user/[:uid]', 'index/user/index');
 Route::any('error', 'index/index/_error');
 Route::any('golink/:url', 'index/expand/golink');
 Route::any('callback/[:code]/[:state]', 'index/user/callback');
+Route::any('create', 'index/topic/create');
+Route::any('update/[:tid]', 'index/topic/update');
 
 return [
 
