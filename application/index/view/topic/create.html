@@ -49,7 +49,7 @@
         //绑定发帖事件
         $$('#create').on('click', function () {
             //设定textarea的内容
-            $$('#editor').text(editor.value());
+            $$('#editor').text(editor.getValue());
 
             //获取表单内容
             let submitData = $$('form').serialize();
@@ -60,6 +60,7 @@
                         message: res.message,
                         position: 'top',
                         onClosed: function () {
+                            editor.clearValue();
                             window.location.href = res.url;
                         }
                     })

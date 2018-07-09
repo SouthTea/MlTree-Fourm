@@ -261,3 +261,6 @@ a.mf-badge:focus {
 code,pre{
   font-family: "Monaco","Dejavu Sans Mono","Fira Code Pro","Source Code Pro",monospace,sans-serif,"Arial","微软雅黑";
 }
+.CodeMirror, .CodeMirror-scroll {
+	max-height: 500px;
+}

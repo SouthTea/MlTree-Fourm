@@ -9,9 +9,6 @@ class Index extends Base
 {
     public function index()
     {
-        // $msg = new Message;
-        // $res = $msg->getMessageList(1);
-        // dump($res);
         $topic = new Topic();
         $tops = $topic->getTops();
         $this->assign('tops', $tops);

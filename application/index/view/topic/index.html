@@ -13,8 +13,8 @@
                 <i class="mdui-icon material-icons">looks</i>{$topicData.views}</span>
         </header>
         <div class="mf-panel-bd">
-            <div class="content" id="mf-content">{$topicData.content|raw}</div>
-            
+            <div class="content" id="mf-content">{$topicData.content|raw|markdownEncode}</div>
+
             {if !empty($attaList)}
             <div class="attaList">
                 <header>
@@ -88,19 +88,16 @@
 
 <!-- 回复区域 -->
 <form class="mdui-hidden" id="replyPanel">
-    <div id="editor" class="mdui-hidden">
-
-    </div>
-    <input type="hidden" id="content" name="content">
+    <textarea id="editor" class="mdui-hidden" name="content"></textarea>
     <input type="hidden" id="recid" name="recid" value="">
 </form>
 
 {/block} {block name="js"}
-<script src="__JS__/simplemde.js"></script>
+<script src="__JS__/simplemde.min.js"></script>
 <script src="__JS__/mltree-flow.js"></script>
 <script src="__JS__/mltree-editor.js"></script>
 <script>
-    var option = {
+    let option = {
         commentUrl: "{:url('index/topic/comment',['tid'=>$topicData.tid])}",
         uid: "{:session('uid')}",
         subject: "{$topicData.subject}",
@@ -108,5 +105,69 @@
     //调用flow加载
     var flow = new mfFlow('comment');
     flow.flow('{$topicData.tid}');
-    // regEditor(type = 'comment', option);
+
+    var editor = new MLTeditor(option)
+
+    layui.use(['layer'], function () {
+        var layer = layui.layer;
+
+        $$('#reply').on('click', function () {
+            $$('#replyPanel').toggleClass('mdui-hidden');
+            $$('#editor').toggleClass('mdui-hidden');
+
+            var device = layui.device(),
+                k = '824px';
+            if (device.weixin || device.android || device.ios) {
+                k = '100%';
+            }
+            layer.open({
+                type: 1,
+                anim: 2,
+                title: '回复『' + option.subject + '』',
+                area: [k, '55%'],
+                offset: 'b',
+                btn: '发布',
+                content: $('#replyPanel'),
+                cancel: function (index, layero) {
+                    $$('#replyPanel').toggleClass('mdui-hidden');
+                    $$('#editor').toggleClass('mdui-hidden');
+                },
+                yes: function (index, layero) {
+                    //设置textarea内容
+                    $$('#editor').text(editor.getValue());
+
+                    var data = $$('#replyPanel').serialize();
+
+                    $$('#editor').toggleClass('mdui-hidden');
+                    $$('#replyPanel').toggleClass('mdui-hidden');
+
+                    editor.setValue('');
+                    layer.close(index);
+
+                    $$.ajax({
+                        method: 'post',
+                        url: option.commentUrl,
+                        data: data,
+                        dataType: 'json',
+                        success: function (res) {
+                            if (res.code == 1) {
+                                mdui.snackbar({
+                                    message: res.message,
+                                    position: 'top',
+                                    onClosed: function () {
+                                        location.reload();
+                                    }
+                                })
+                            } else {
+                                mdui.snackbar({
+                                    message: res.message,
+                                    position: 'top',
+                                })
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    })
 </script>{/block}

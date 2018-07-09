@@ -15,6 +15,7 @@ class MLTeditor {
         this.option = option;
         this.Meditor = new SimpleMDE({
             element: document.getElementById("editor"),
+            spellChecker: false,
             autofocus: true,
             autosave: {
                 enabled: true,
@@ -24,8 +25,9 @@ class MLTeditor {
             placeholder: "请开始你的创作吧~",
             prompturls: true,
             renderingConfig: {
-                codeSyntaxHighlighting: true
-            }
+                singleLineBreaks: false,
+                codeSyntaxHighlighting: true,
+            },
         })
     }
 
@@ -42,11 +44,11 @@ class MLTeditor {
     }
 
     setValue(content = '') {
-        this.Meditor.Value(content)
+        this.Meditor.value(content)
     }
 
     getValue() {
-        return this.Meditor.Value();
+        return this.Meditor.value();
     }
 
     clearValue() {
@@ -82,50 +84,4 @@ $$('#file').on('click', () => {
             },
         ]
     })
-});
-
-//绑定回复事件
-$$('#reply').on('click', function () {
-    //切换回复面板可视状态
-    $$('#replyPanel').toggleClass('mdui-hidden');
-    $$('#editor').toggleClass('mdui-hidden');
-
-    //获取当前设备指定面板宽度
-    var device = layui.device(),
-        k = '824px';
-    if (device.weixin || device.android || device.ios) {
-        k = '100%';
-    }
-
-    layer.open({
-        type: 1,
-        anim: 2,
-        title: '回复『' + option.subject + '』',
-        area: k,
-        offset: 'b',
-        btn: '发布',
-        content: $$('#replyPanel'),
-        cancel: function (index, layero) {
-            $$('#replyPanel').toggleClass('mdui-hidden');
-            $$('#editor').toggleClass('mdui-hidden');
-        },
-        yes: function (index, layero) {
-            var data = $$('#replyPanel').serialize();
-            data.reCid = re_cid;
-            $$('#editor').toggleClass('mdui-hidden');
-            $$('#replyPanel').toggleClass('mdui-hidden');
-            editor.clear()
-            layer.close(index);
-            editor
-            $$.ajax({
-                method: 'post',
-                url: option.commentUrl,
-                data: data,
-                dataType: 'json',
-                success: function (res) {
-
-                }
-            });
-        }
-    });
 });

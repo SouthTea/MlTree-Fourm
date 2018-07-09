@@ -13,6 +13,7 @@
 use think\Db;
 use Auth\Auth;
 use Markdown\Parser;
+use League\CommonMark\CommonMarkConverter;
 
 function createStr($length)
 {
@@ -119,8 +120,28 @@ function outResult($code=0, $msg, $url='')
     }
 }
 
-function markdownEncode($text){
+function markdownEncode($text)
+{
     $parser = new Parser;
     $html = $parser->makeHtml($text);
     return $html;
+}
+
+// function markdownEncode($text)
+// {
+//     $converter = new CommonMarkConverter(['html_input' => 'escape']);
+//     $html = $converter->convertToHtml($text);
+//     return $html;
+// }
+
+function replyRegular($str)
+{
+    $pre = '{@(\d+)/(\d+)}';
+    if (preg_match($pre, $str, $arr)) {
+        $user = Db::name('user')->where('uid', $arr[1])->find();
+        $html = '回复 <a href="' . url('index/user/index', ['uid'=>$arr[1]]) . '">@' . $user['username'] . '</a>';
+        $html .= '：<a href="#replu-content-' . $arr[2] . '">#' . $arr[2] . '</a>';
+        return [$arr[0],$arr[1],$arr[2],$html];
+    }
+    return 'error';
 }

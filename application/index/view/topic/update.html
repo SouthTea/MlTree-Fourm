@@ -23,9 +23,9 @@
                 required/>
         </div>
 
-        <textarea id="editor" name="content" required></textarea>
+        <textarea id="editor" name="content" required>{$topicData.content|raw}</textarea>
 
-        <input id="files" type="hidden" name="files" value=""> {:token()}
+        {:token()}
         <input type="hidden" name="sign" value="{$topicData.sign}">
     </form>
     <div>
@@ -45,17 +45,19 @@
 <script>
     let option = {
         uid: "{:session('uid')}",
-        url: '{:url("index/topic/update")}',
+        url: '{:url("index/topic/update",["uid"=>session("uid"),"tid"=>$topicData.tid])}',
     }
-    var editor = new MLTeditor(option)
-
+    var editor = new MLTeditor(option);
+    var $$ = mdui.JQ;
     layui.use('layer', function () {
         let layer = layui.layer;
 
         //绑定发帖事件
         $$('#create').on('click', function () {
+            console.log('ok');
+            
             //设定textarea的内容
-            $$('#editor').text(editor.value());
+            $$('#editor').text(editor.getValue());
 
             //获取表单内容
             let submitData = $$('form').serialize();
@@ -66,6 +68,7 @@
                         message: res.message,
                         position: 'top',
                         onClosed: function () {
+                            editor.clearValue();
                             window.location.href = res.url;
                         }
                     })
@@ -81,11 +84,6 @@
             })
 
             return false;
-        });
-
-        layer.photos({
-            photos: '#mf-content,#mf-comments',
-            anim: 5
         });
     });
 </script> {/block}
